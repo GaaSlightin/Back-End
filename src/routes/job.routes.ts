@@ -1,2 +1,2 @@
 import { Router } from "express";
-import { JobController } from "../controllers/job.controller";
+import { JobController } from "../controllers/job.controllers";
