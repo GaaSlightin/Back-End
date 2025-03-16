@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 import { Request } from "express";
 export interface Profile {
-   id: string;
+   _id: string;
    emails?: { value: string }[];
    username?: string;
    displayName: string;
