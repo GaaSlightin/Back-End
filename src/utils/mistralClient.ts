@@ -81,12 +81,4 @@ async function extractJobData(
   }
 }
 
-// async function test() {
-//   const url =
-//     "https://www.incorta.com/careers/job-detail?lv_jid=cd2c2b3a-44af-4d99-bdd7-53d6b002eaf5&_gl=1*1lz300l*_gcl_au*MTI5Mzk4NjI5MC4xNzQyMTE2Njk5";
-//   const data = await extractJobData(url);
-//   console.log(data);
-// }
-
-// test().catch(console.error);
 export default extractJobData;

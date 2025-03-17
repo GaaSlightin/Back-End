@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { IJob } from "../interfaces/job.interfaces";
-import { randomUUID } from "crypto";
 
 const jobSchema = new Schema<IJob>(
   {
