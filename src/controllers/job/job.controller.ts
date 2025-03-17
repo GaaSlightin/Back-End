@@ -45,16 +45,15 @@ export class JobController {
 
       const savedJob = await newJob.save();
 
-      // Create Description document with the saved jobId
       const newDescription = new DescriptionModel({
-        jobId: savedJob._id || "Unknown",
+        jobId: savedJob._id,
         userId,
-        location: description.location || "Unknown",
+        location: description.location,
         posting_date: new Date(description.posting_date || new Date()),
         skills: Array.isArray(description.skills) ? description.skills : [],
         url,
-        fullText: description.fullText || "No description available",
-        summary: description.summary || "",
+        fullText: description.fullText,
+        summary: description.summary,
       });
 
       const savedDescription = await newDescription.save();
