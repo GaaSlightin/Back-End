@@ -1,7 +1,7 @@
 import { Mistral } from "@mistralai/mistralai";
 import scrapeJobPage from "./webScrapper";
 import { Job, Description } from "../interfaces/job.interfaces";
-const MISTRAL_API_KEY = "QigZ1MIvmyCds0TWrCp7jNf7OZ7qeJwG";
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
 const client = new Mistral({ apiKey: MISTRAL_API_KEY });
 

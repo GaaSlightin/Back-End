@@ -32,7 +32,6 @@ export class JobController {
         return res.status(400).json({ message: "Invalid URL" });
       }
       const { job, description } = await extractJobData(url);
-      console.log(job, description);
 
       const newJob = new JobModel({
         userId,
