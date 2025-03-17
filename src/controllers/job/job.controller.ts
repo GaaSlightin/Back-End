@@ -83,6 +83,24 @@ export class JobController {
     }
   };
 
+  public static getJobDescription = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const userId = (req as IAuthRequest).user._id;
+      const jobId = req.params.jobId;
+      const description = await DescriptionModel.findOne({ jobId, userId });
+      if (!description)
+        return res.status(404).json({ message: "Description not found" });
+
+      res.status(200).json(description);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public static updateJob = async (
     req: Request,
     res: Response,
@@ -113,12 +131,17 @@ export class JobController {
     try {
       const userId = (req as IAuthRequest).user._id;
       const jobId = req.params.jobId;
-      const job = await JobModel.findByIdAndDelete({ _id: jobId, userId });
+      const job = await JobModel.findOne({ _id: jobId, userId });
       if (!job) return res.status(404).json({ message: "Job not found" });
 
-      await DescriptionModel.deleteOne({ jobId, userId });
+      await Promise.all([
+        JobModel.deleteOne({ _id: jobId, userId }),
+        DescriptionModel.deleteOne({ jobId, userId }),
+      ]);
 
-      res.status(200).json({ message: "Job deleted successfully" });
+      res
+        .status(200)
+        .json({ message: "Job and description deleted successfully" });
     } catch (error) {
       next(error);
     }

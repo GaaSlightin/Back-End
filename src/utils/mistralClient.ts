@@ -65,10 +65,6 @@ async function extractJobData(
 
   try {
     const extractedData = JSON.parse(rawResponse);
-    extractedData.job.archive_date = new Date(extractedData.job.archive_date);
-    extractedData.description.posting_date = new Date(
-      extractedData.description.posting_date
-    );
     return extractedData;
   } catch (error) {
     console.error("Raw response causing JSON parse error:", rawResponse);
