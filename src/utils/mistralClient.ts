@@ -56,11 +56,10 @@ async function extractJobData(
       : "";
 
   if (typeof rawResponse === "string") {
-    // Fallback: Strip Markdown if present
     rawResponse = rawResponse
-      .replace(/```json/g, "") // Remove ```json
-      .replace(/```/g, "") // Remove closing ```
-      .trim(); // Remove leading/trailing whitespace
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
   } else {
     rawResponse = "";
   }
