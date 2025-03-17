@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from "express";
 import dotenv from "dotenv";
 import { dbConnection } from "./db/db";
@@ -46,3 +47,26 @@ app.listen(port, (err) => {
   }
   console.log(`Running server on port ${port}`);
 });
+=======
+import express from "express"
+import dotenv from "dotenv"
+dotenv.config()
+const app=express()
+const port=process.env.PORT||8080
+
+app.use(express.json())
+
+
+app.use("/",(req,res)=>{
+   res.json({
+      status:"Done",
+      message:"server running"
+   })
+})
+app.listen(port,(err)=>{
+   if(err){
+      console.log("Cannot initalize the server")
+   }
+   console.log(`Running server on port ${port}`)
+})
+>>>>>>> 70db452cbdbdcd99bd2130bc3f541bef433bf880

@@ -10,18 +10,19 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+<<<<<<< HEAD
     "@types/passport": "^1.0.17",
     "@types/passport-github": "^1.1.12",
     "axios": "^1.8.3",
+=======
+>>>>>>> 70db452cbdbdcd99bd2130bc3f541bef433bf880
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.12.1",
-    "passport": "^0.7.0",
-    "passport-github": "^1.1.0"
+    "mongoose": "^8.12.1"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
