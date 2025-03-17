@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface Skill {
   id?: string;
@@ -6,14 +6,10 @@ export interface Skill {
   category?: string;
 }
 export interface Job {
-  jobId?: string;
   userId: string;
   title: string;
   company: string;
-  location: string;
-  posting_date: Date;
   archive_date: Date;
-  skills: Skill[];
   source: string;
   url: string;
 }
@@ -23,7 +19,11 @@ export interface IJob extends Job, Document {}
 export interface Description {
   descriptionId?: string;
   jobId: string;
+  location: string;
   userId: string;
+  posting_date: Date;
+  skills: Skill[];
+  url: string;
   fullText: string;
   summary?: string;
 }

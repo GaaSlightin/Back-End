@@ -1,23 +1,15 @@
 import mongoose, { Schema } from "mongoose";
-import { IJob, Skill } from "../interfaces/job.interfaces";
-
-const skillSchema = new Schema<Skill>({
-  name: { type: String, required: true },
-  category: { type: String },
-});
+import { IJob } from "../interfaces/job.interfaces";
+import { randomUUID } from "crypto";
 
 const jobSchema = new Schema<IJob>(
   {
-    jobId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     company: { type: String, required: true },
-    location: { type: String, required: true },
-    posting_date: { type: Date, required: true },
     archive_date: { type: Date, required: true },
     source: { type: String, required: true },
     url: { type: String, required: true },
     userId: { type: String, required: true, index: true },
-    skills: { type: [skillSchema], default: [] },
   },
   { timestamps: true }
 );

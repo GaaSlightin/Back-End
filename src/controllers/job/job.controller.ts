@@ -2,11 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import JobModel from "../../models/job.model";
 import DescriptionModel from "../../models/description.model";
 import { IAuthRequest } from "../../interfaces/auth.interfaces";
-import {
-  generateSummary,
-  extractJobDataFromUrl,
-} from "../../utils/mistralClient";
 import { Job, Description } from "../../interfaces/job.interfaces";
+import extractJobData from "../../utils/mistralClient";
 export class JobController {
   public static getAllJobs = async (
     req: Request,
@@ -30,42 +27,44 @@ export class JobController {
     try {
       const userId = (req as IAuthRequest).user._id;
       const { url } = req.body;
-      if (url && /^https?:\/\/[^\s$.?#].[^\s]*$/.test(url)) {
-        const { job, description } = await extractJobDataFromUrl(url);
 
-        const generatedSummary = await generateSummary(description.fullText);
-
-        const newDescription = new DescriptionModel({
-          ...description,
-          jobId: "",
-          userId,
-          fullText: description.fullText,
-          summary: generatedSummary || "",
-        } as Partial<Description>);
-
-        const savedDescription = await newDescription.save();
-
-        const newJob: any = new JobModel({
-          ...job,
-          userId,
-          descriptionId: savedDescription._id,
-          jobId: undefined,
-          archive_date: new Date(job.archive_date || new Date(0)),
-        } as Partial<Job>);
-
-        savedDescription.jobId = newJob._id.toString();
-        await savedDescription.save();
-
-        const savedJob = await newJob.save();
-        res.status(201).json({ job: savedJob, description: savedDescription });
-      } else {
-        res.status(400).json({ message: "Invalid URL" });
+      if (!url || !/^https?:\/\/[^\s$.?#].[^\s]*$/.test(url)) {
+        return res.status(400).json({ message: "Invalid URL" });
       }
+      const { job, description } = await extractJobData(url);
+      console.log(job, description);
+
+      const newJob = new JobModel({
+        userId,
+        title: job.title,
+        company: job.company,
+        archive_date: new Date(job.archive_date || new Date()),
+        source: job.source || new URL(url).hostname,
+        url,
+      });
+
+      const savedJob = await newJob.save();
+
+      // Create Description document with the saved jobId
+      const newDescription = new DescriptionModel({
+        jobId: savedJob._id || "Unknown",
+        userId,
+        location: description.location || "Unknown",
+        posting_date: new Date(description.posting_date || new Date()),
+        skills: Array.isArray(description.skills) ? description.skills : [],
+        url,
+        fullText: description.fullText || "No description available",
+        summary: description.summary || "",
+      });
+
+      const savedDescription = await newDescription.save();
+
+      res.status(201).json({ job: savedJob, description: savedDescription });
     } catch (error) {
+      console.error("Error in createJob:", error);
       next(error);
     }
   };
-
   public static getJobById = async (
     req: Request,
     res: Response,
