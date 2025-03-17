@@ -1,5 +1,6 @@
 import { Document } from "mongoose";
 import { Request } from "express";
+import { Profile as PassportProfile } from "passport-github";
 export interface Profile {
    _id: string;
    emails?: { value: string }[];
@@ -132,4 +133,7 @@ export interface IRepoOwner {
 export interface JwtPayload {
   _id: string;
   // Add other properties if needed
+}
+export interface ExtendedProfile extends PassportProfile {
+  accessToken: string;
 }

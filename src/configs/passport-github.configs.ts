@@ -1,6 +1,7 @@
 import passport from "passport";
 import { Strategy as GitHubStrategy } from "passport-github";
 import dotenv from "dotenv";
+import { ExtendedProfile } from "../interfaces/auth.interfaces";
 dotenv.config();
 
 const gitHubClientID = process.env.GITHUB_CLIENT_ID as string;
@@ -12,7 +13,9 @@ passport.use(new GitHubStrategy({
    callbackURL: "http://localhost:3000/api/v0/auth/github/callback",
 },
 async (accessToken, refreshToken, profile, done) => {
-   return done(null, profile);
+   const extendedProfile = profile as ExtendedProfile;
+   extendedProfile.accessToken = accessToken;
+   return done(null, extendedProfile);
 }));
 
 passport.serializeUser(function(user: any, cb) {
@@ -26,4 +29,3 @@ passport.deserializeUser(function(user: any, cb) {
      return cb(null, user);
    });
 });
-

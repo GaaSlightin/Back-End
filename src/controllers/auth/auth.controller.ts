@@ -7,20 +7,23 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
   try {
     const profile = req.user as Profile;
     if (!profile) {
-       res.status(400).send("Profile is undefined");
-       return;
+      res.status(400).send("Profile is undefined");
+      return;
     }
-    console.log("access token coming from oAuth",profile.accessToken)
+    console.log("access token coming from oAuth", profile.accessToken);
     let existingUser = await User.findOne({ userName: profile.username });
     console.log(profile.username);
     if (!existingUser) {
-       existingUser = await User.create({
-          email: profile.emails?.[0]?.value,
-          userName: profile.username,
-          displayName:profile.displayName,
-          profileImage: profile.photos?.[0]?.value,
-          githubAccessToken:profile.accessToken
-       });
+      existingUser = await User.create({
+        email: profile.emails?.[0]?.value,
+        userName: profile.username,
+        displayName: profile.displayName,
+        profileImage: profile.photos?.[0]?.value,
+        githubAccessToken: profile.accessToken // Store the access token
+      });
+    } else {
+      existingUser.githubAccessToken = profile.accessToken; // Update the access token if the user already exists
+      await existingUser.save();
     }
     const refreshToken = generateRefreshToken(existingUser._id);
     existingUser.refreshToken = refreshToken;
@@ -28,14 +31,14 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
 
     const token = generateAccessToken(existingUser._id);
     res.status(201).json({
-       message: "success",
-       data: { 
-          accessToken: token ,
-          refreshToken:refreshToken,
-       }
+      message: "success",
+      data: {
+        accessToken: token,
+        refreshToken: refreshToken,
+      }
     });
- } catch (error: any) {
+  } catch (error: any) {
     console.error("Error in authentication", error);
     next(error);
- }
+  }
 };
