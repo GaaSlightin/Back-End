@@ -17,6 +17,7 @@ const port = process.env.PORT || 8080;
 app.use(express.json());
 app.use(cookieParser());
 
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,
