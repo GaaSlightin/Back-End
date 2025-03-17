@@ -10,6 +10,7 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
        res.status(400).send("Profile is undefined");
        return;
     }
+    console.log("access token coming from oAuth",profile.accessToken)
     let existingUser = await User.findOne({ userName: profile.username });
     console.log(profile.username);
     if (!existingUser) {
@@ -18,6 +19,7 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
           userName: profile.username,
           displayName:profile.displayName,
           profileImage: profile.photos?.[0]?.value,
+          githubAccessToken:profile.accessToken
        });
     }
     const refreshToken = generateRefreshToken(existingUser._id);

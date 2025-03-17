@@ -8,6 +8,7 @@ export interface Profile {
    provider: string;
    photos?: { value: string }[];
    refreshToken?: string;
+   accessToken:string;
 }
 
 export interface IUser extends Document {
@@ -20,6 +21,7 @@ export interface IUser extends Document {
   refreshToken:string;
   createdAt: Date;
   updatedAt: Date;
+  githubAccessToken:string;
 }
 export interface IAuthRequest extends Request{
   user: IUser;
@@ -126,4 +128,8 @@ export interface IRepoOwner {
   type: string;
   user_view_type: string;
   site_admin: boolean;
+}
+export interface JwtPayload {
+  _id: string;
+  // Add other properties if needed
 }

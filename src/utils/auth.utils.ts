@@ -7,12 +7,12 @@ dotenv.config();
 const accessTokenKey = process.env.ACCESS_TOKEN_SECRET as string;
 const refreshTokenKey = process.env.REFRESH_TOKEN_SECRET as string;
 
-export const generateAccessToken = (id: string) => {
-   return jwt.sign({id}, accessTokenKey, { expiresIn: '15m' });
+export const generateAccessToken = (_id: string) => {
+   return jwt.sign({_id}, accessTokenKey, { expiresIn: '15m' });
 };
 
-export const generateRefreshToken = (id: string) => {
-   return jwt.sign({id}, refreshTokenKey, { expiresIn: '7d' });
+export const generateRefreshToken = (_id: string) => {
+   return jwt.sign({_id}, refreshTokenKey, { expiresIn: '7d' });
 };
 
 export function verifyToken(token: string, type: "access" | "refresh"): Promise<any> {
