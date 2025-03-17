@@ -15,6 +15,7 @@ const jobSchema = new Schema<IJob>(
     archive_date: { type: Date, required: true },
     source: { type: String, required: true },
     url: { type: String, required: true },
+    userId: { type: String, required: true, index: true },
     skills: { type: [skillSchema], default: [] },
   },
   { timestamps: true }

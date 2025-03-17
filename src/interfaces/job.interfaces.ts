@@ -1,18 +1,19 @@
 import { Document } from "mongoose";
 
-export interface Skill{
-  id?:string;
+export interface Skill {
+  id?: string;
   name: string;
-  category?: string
+  category?: string;
 }
 export interface Job {
-  jobId: string;
+  jobId?: string;
+  userId: string;
   title: string;
   company: string;
   location: string;
   posting_date: Date;
   archive_date: Date;
-  skills: Skill[]
+  skills: Skill[];
   source: string;
   url: string;
 }
@@ -20,8 +21,9 @@ export interface Job {
 export interface IJob extends Job, Document {}
 
 export interface Description {
-  descriptionId: string;
+  descriptionId?: string;
   jobId: string;
+  userId: string;
   fullText: string;
   summary?: string;
 }
