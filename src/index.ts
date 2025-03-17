@@ -1,10 +1,22 @@
-import express from "express"
-import dotenv from "dotenv"
-dotenv.config()
-const app=express()
-const port=process.env.PORT||8080
+import express from "express";
+import dotenv from "dotenv";
+import { dbConnection } from "./db/db";
+import passport from "passport";
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import routes from "./routes";
+import { errorHandler } from "./middleware/errorHandler.middleware"; // Import the error handler
 
-app.use(express.json())
+dotenv.config();
+const app = express();
+const port = process.env.PORT || 8080;
+
+(async () => {
+  await dbConnection();
+})();
+app.use(express.json());
+app.use(cookieParser());
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,
@@ -34,4 +46,3 @@ app.listen(port, (err) => {
   }
   console.log(`Running server on port ${port}`);
 });
-
