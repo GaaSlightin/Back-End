@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import JobModel from "../../models/job.model";
 import DescriptionModel from "../../models/description.model";
 import { IAuthRequest } from "../../interfaces/auth.interfaces";
-
+import {
+  generateSummary,
+  extractJobDataFromUrl,
+} from "../../utils/mistralClient";
+import { Job, Description } from "../../interfaces/job.interfaces";
 export class JobController {
   public static getAllJobs = async (
     req: Request,
@@ -25,52 +29,38 @@ export class JobController {
   ) => {
     try {
       const userId = (req as IAuthRequest).user._id;
-      const {
-        title,
-        company,
-        location,
-        posting_date,
-        archive_date,
-        source,
-        url,
-        skills,
-        fullText,
-        summary,
-      } = req.body;
-      if (
-        !title ||
-        !company ||
-        !location ||
-        !posting_date ||
-        !archive_date ||
-        !source ||
-        !url
-      ) {
-        return res.status(400).json({ message: "Missing required fields" });
+      const { url } = req.body;
+      if (url && /^https?:\/\/[^\s$.?#].[^\s]*$/.test(url)) {
+        const { job, description } = await extractJobDataFromUrl(url);
+
+        const generatedSummary = await generateSummary(description.fullText);
+
+        const newDescription = new DescriptionModel({
+          ...description,
+          jobId: "",
+          userId,
+          fullText: description.fullText,
+          summary: generatedSummary || "",
+        } as Partial<Description>);
+
+        const savedDescription = await newDescription.save();
+
+        const newJob: any = new JobModel({
+          ...job,
+          userId,
+          descriptionId: savedDescription._id,
+          jobId: undefined,
+          archive_date: new Date(job.archive_date || new Date(0)),
+        } as Partial<Job>);
+
+        savedDescription.jobId = newJob._id.toString();
+        await savedDescription.save();
+
+        const savedJob = await newJob.save();
+        res.status(201).json({ job: savedJob, description: savedDescription });
+      } else {
+        res.status(400).json({ message: "Invalid URL" });
       }
-
-      const newJob = new JobModel({
-        title,
-        company,
-        location,
-        posting_date,
-        archive_date,
-        source,
-        url,
-        skills,
-        userId,
-      });
-      const savedJob = await newJob.save();
-
-      const newDescription = new DescriptionModel({
-        jobId: savedJob._id,
-        userId,
-        fullText,
-        summary,
-      });
-      const savedDesc = await newDescription.save();
-
-      res.status(201).json({ job: savedJob, description: savedDesc });
     } catch (error) {
       next(error);
     }

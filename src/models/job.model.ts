@@ -8,6 +8,7 @@ const skillSchema = new Schema<Skill>({
 
 const jobSchema = new Schema<IJob>(
   {
+    jobId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     company: { type: String, required: true },
     location: { type: String, required: true },

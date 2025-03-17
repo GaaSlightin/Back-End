@@ -10,8 +10,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@mistralai/mistralai": "^1.5.1",
+    "@types/cheerio": "^0.22.35",
     "@types/passport": "^1.0.17",
     "@types/passport-github": "^1.1.12",
+    "axios": "^1.8.3",
+    "cheerio": "^1.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
