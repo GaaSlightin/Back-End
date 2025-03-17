@@ -1,9 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../../models/user.model";
-import { generateAccessToken, generateRefreshToken } from "../../utils/auth.utils";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../utils/auth.utils";
 import { Profile } from "../../interfaces/auth.interfaces";
 
-export const handleGithubAuth = async (req: Request, res: Response, next: NextFunction) => {
+export const handleGithubAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const profile = req.user as Profile;
     if (!profile) {

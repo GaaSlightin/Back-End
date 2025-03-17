@@ -19,3 +19,7 @@ const jobSchema = new Schema<IJob>(
   },
   { timestamps: true }
 );
+
+const JobModel = mongoose.model<IJob>("Job", jobSchema);
+
+export default JobModel;

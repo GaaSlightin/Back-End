@@ -1,5 +1,4 @@
 import { Document } from "mongoose";
-import { Request } from "express";
 export interface Profile {
    id: string;
    emails?: { value: string }[];
