@@ -52,7 +52,6 @@ export class JobController {
         skills: Array.isArray(description.skills) ? description.skills : [],
         url,
         fullText: description.fullText,
-        summary: description.summary,
       });
 
       const savedDescription = await newDescription.save();

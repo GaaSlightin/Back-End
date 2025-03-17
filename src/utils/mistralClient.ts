@@ -27,7 +27,6 @@ async function extractJobData(
   - skills (array of { name: string }): List skills mentioned in the content
   - url (string): The provided URL
   - fullText (string): The full scraped text
-  - summary (string, optional): A brief summary of the job, if derivable
 
   Here's the scraped content:
   ${content}

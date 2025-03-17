@@ -25,7 +25,6 @@ export interface Description {
   skills: Skill[];
   url: string;
   fullText: string;
-  summary?: string;
 }
 
 export interface IDescription extends Description, Document {}

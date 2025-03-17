@@ -13,7 +13,6 @@ const descriptionSchema = new Schema<IDescription>(
     url: { type: String, required: true },
     location: { type: String, required: true },
     fullText: { type: String, required: true },
-    summary: { type: String },
     posting_date: { type: Date, required: true },
     skills: { type: [skillSchema], default: [] },
   },
