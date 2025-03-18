@@ -1,6 +1,7 @@
-import { Document } from "mongoose";
 import { Request } from "express";
+import { Document } from "mongoose";
 import { Profile as PassportProfile } from "passport-github";
+
 export interface Profile {
    _id: string;
    emails?: { value: string }[];
@@ -14,17 +15,17 @@ export interface Profile {
 
 export interface IUser extends Document {
   _id: string; // the id will become the result of random uuid coming from crypto package
-  password?:string;
+  password?: string;
   email?: string;
   userName?: string;
   displayName: string;
   profileImage?: string;
-  refreshToken:string;
+  refreshToken: string;
   createdAt: Date;
   updatedAt: Date;
   githubAccessToken:string;
 }
-export interface IAuthRequest extends Request{
+export interface IAuthRequest extends Request {
   user: IUser;
 }
 

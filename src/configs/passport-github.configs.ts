@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GitHubStrategy } from "passport-github";
 import dotenv from "dotenv";
 import { ExtendedProfile } from "../interfaces/auth.interfaces";
+
 dotenv.config();
 
 const gitHubClientID = process.env.GITHUB_CLIENT_ID as string;
