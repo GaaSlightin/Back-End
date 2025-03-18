@@ -45,7 +45,7 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
       });*/
   
       // Redirect to the home page
-      res.redirect(`${process.env.FRONTEND_URL}/home`);
+      res.redirect(`${process.env.FRONTEND_URL}/profile`);
   } catch (error: any) {
     console.error("Error in authentication", error);
     next(error);
