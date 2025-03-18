@@ -1,9 +1,12 @@
+
 import { Router } from "express";
 import authRouter from "./auth.router";
-import jobRouter from "./job.routes";
+import githubRouter from "./github.router";
+
 
 const router = Router();
 
-router.use("/auth", authRouter);
-router.use("/jobs", jobRouter);
+router.use("/auth", authRouter)
+router.use("/github",githubRouter)
+
 export default router;

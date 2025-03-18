@@ -5,6 +5,8 @@ import passport from "passport";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import routes from "./routes";
+import { errorHandler } from "./middleware/errorHandler.middleware"; // Import the error handler
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 8080;
@@ -35,9 +37,13 @@ app.use("/", (req, res) => {
   });
 });
 
+// Use the error handling middleware
+app.use(errorHandler);
+
 app.listen(port, (err) => {
   if (err) {
     console.log("Cannot initialize the server");
   }
   console.log(`Running server on port ${port}`);
 });
+export default app;

@@ -9,7 +9,8 @@ const UserSchema = new Schema<IUser>(
     userName: { type: String, unique: true, sparse: true }, // Optional username
     displayName: { type: String }, // Display name from OAuth
     profileImage: { type: String }, // Profile picture URL
-    refreshToken: { type: String },
+    refreshToken:{type:String},
+    githubAccessToken:{type:String}
   },
   { timestamps: true }
 );

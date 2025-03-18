@@ -1,47 +1,41 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../../models/user.model";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../../utils/auth.utils";
+import { generateAccessToken, generateRefreshToken } from "../../utils/auth.utils";
 import { Profile } from "../../interfaces/auth.interfaces";
 
-export const handleGithubAuth = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const handleGithubAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const profile = req.user as Profile;
     if (!profile) {
       res.status(400).send("Profile is undefined");
       return;
     }
-
-    let existingUser = await User.findOne({ _id: profile.id });
-
+    console.log("access token coming from oAuth", profile.accessToken);
+    let existingUser = await User.findOne({ userName: profile.username });
+    console.log(profile.username);
     if (!existingUser) {
-      const newUser = new User({
-        _id: profile.id,
-        email: profile.emails ? profile.emails[0].value : undefined,
+      existingUser = await User.create({
+        email: profile.emails?.[0]?.value,
         userName: profile.username,
         displayName: profile.displayName,
-        profileImage: profile.photos ? profile.photos[0].value : undefined,
-        authProvider: profile.provider,
-        refreshToken: generateRefreshToken(profile.id),
+        profileImage: profile.photos?.[0]?.value,
+        githubAccessToken: profile.accessToken // Store the access token
       });
-
-      await newUser.save();
-      existingUser = newUser;
+    } else {
+      existingUser.githubAccessToken = profile.accessToken; // Update the access token if the user already exists
+      await existingUser.save();
     }
-
-    const accessToken = generateAccessToken(existingUser._id);
     const refreshToken = generateRefreshToken(existingUser._id);
+    existingUser.refreshToken = refreshToken;
+    await existingUser.save();
 
-    res.json({
-      accessToken,
-      refreshToken,
-      user: existingUser,
+    const token = generateAccessToken(existingUser._id);
+    res.status(201).json({
+      message: "success",
+      data: {
+        accessToken: token,
+        refreshToken: refreshToken,
+      }
     });
   } catch (error: any) {
     console.error("Error in authentication", error);
