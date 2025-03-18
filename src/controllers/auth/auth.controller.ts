@@ -34,9 +34,9 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
     const token = generateAccessToken(existingUser._id);
        // Set the access token and refresh token as HTTP-only cookies
        res.cookie("accessToken", token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,//process.env.NODE_ENV === "production", // Use secure cookies in production
-        sameSite: "strict",
+        sameSite: "none",
       });
       /*res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
