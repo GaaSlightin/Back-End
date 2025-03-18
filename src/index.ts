@@ -46,3 +46,4 @@ app.listen(port, (err) => {
   }
   console.log(`Running server on port ${port}`);
 });
+export default app;
