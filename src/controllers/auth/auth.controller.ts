@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import User from "../../models/user.model";
 import { generateAccessToken, generateRefreshToken } from "../../utils/auth.utils";
 import { Profile } from "../../interfaces/auth.interfaces";
+import dotenv from "dotenv"
+dotenv.config()
 
 export const handleGithubAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -30,13 +32,20 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
     await existingUser.save();
 
     const token = generateAccessToken(existingUser._id);
-    res.status(201).json({
-      message: "success",
-      data: {
-        accessToken: token,
-        refreshToken: refreshToken,
-      }
-    });
+       // Set the access token and refresh token as HTTP-only cookies
+       res.cookie("accessToken", token, {
+        httpOnly: true,
+        secure: false,//process.env.NODE_ENV === "production", // Use secure cookies in production
+        sameSite: "strict",
+      });
+      /*res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,//process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });*/
+  
+      // Redirect to the home page
+      res.redirect(`${process.env.FRONTEND_URL}/home`);
   } catch (error: any) {
     console.error("Error in authentication", error);
     next(error);
