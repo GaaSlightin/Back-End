@@ -31,18 +31,24 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
     existingUser.refreshToken = refreshToken;
     await existingUser.save();
 
+      const cookieOptions = {
+      httpOnly: true,  // Prevent JavaScript access
+      secure: process.env.NODE_ENV === "production", // Secure in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" as "none" : "lax" as "lax", // Adjust based on env
+      path: "/"
+    };
+
+
     const token = generateAccessToken(existingUser._id);
-       // Set the access token and refresh token as HTTP-only cookies
        res.cookie("accessToken", token, {
-        httpOnly: false,
-        secure: false,//process.env.NODE_ENV === "production", // Use secure cookies in production
-        sameSite: "none",
+        ...cookieOptions,
+        maxAge: 7 * 24 * 60 * 60 * 1000 
       });
-      /*res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: false,//process.env.NODE_ENV === "production",
-        sameSite: "strict",
-      });*/
+      console.log("Set cookies:", {
+        access_token: token,
+        refresh_token: refreshToken
+      });
+  
   
       // Redirect to the home page
       res.redirect(`${process.env.FRONTEND_URL}/profile`);
