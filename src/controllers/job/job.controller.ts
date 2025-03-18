@@ -69,12 +69,14 @@ export class JobController {
   ) => {
     try {
       const userId = (req as IAuthRequest).user._id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
       const jobId = req.params.jobId;
-      const job = await JobModel.findById({ _id: jobId, userId });
+      const job = await JobModel.findOne({ _id: jobId, userId }).lean();
       if (!job) return res.status(404).json({ message: "Job not found" });
 
       const description = await DescriptionModel.findOne({
-        jobId: job._id,
+        jobId,
         userId,
       });
       res.status(200).json({ job, description });

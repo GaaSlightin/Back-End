@@ -13,11 +13,14 @@ router
   .get(asyncHandler(JobController.getAllJobs));
 
 router
-  .route("/:id")
+  .route("/:jobId")
   .get(asyncHandler(JobController.getJobById))
   .put(asyncHandler(JobController.updateJob))
   .delete(asyncHandler(JobController.deleteJob));
 
-router.get("/:id/description", asyncHandler(JobController.getJobDescription));
+router.get(
+  "/:jobId/description",
+  asyncHandler(JobController.getJobDescription)
+);
 
 export default router;
