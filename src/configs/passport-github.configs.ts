@@ -6,11 +6,11 @@ dotenv.config();
 
 const gitHubClientID = process.env.GITHUB_CLIENT_ID as string;
 const gitHubClientSecret = process.env.GITHUB_CLIENT_SECRET as string;
-
+const baseUrl = process.env.BASE_URL as string;
 passport.use(new GitHubStrategy({
    clientID: gitHubClientID,
    clientSecret: gitHubClientSecret,
-   callbackURL: "http://localhost:3000/api/v0/auth/github/callback",
+   callbackURL: `${baseUrl}/api/v0/auth/github/callback`,
 },
 async (accessToken, refreshToken, profile, done) => {
    const extendedProfile = profile as ExtendedProfile;
