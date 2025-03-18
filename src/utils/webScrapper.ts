@@ -11,7 +11,7 @@ async function scrapeJobPage(url: string): Promise<string> {
     });
     const html = response.data as string;
     const $ = cheerio.load(html);
-    const jobContent = $("body").text();
+    const jobContent = $("body").text().replace(/\s/g, "");
 
     return jobContent;
   } catch (error) {

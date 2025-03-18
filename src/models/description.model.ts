@@ -1,11 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { IDescription, Description, Skill } from "../interfaces/job.interfaces";
 
-const skillSchema = new Schema<Skill>({
-  name: { type: String, required: true },
-  category: { type: String },
-});
-
 const descriptionSchema = new Schema<IDescription>(
   {
     jobId: { type: String, required: true, index: true },
@@ -14,7 +9,7 @@ const descriptionSchema = new Schema<IDescription>(
     location: { type: String, required: true },
     fullText: { type: String, required: true },
     posting_date: { type: Date, required: true },
-    skills: { type: [skillSchema], default: [] },
+    skills: { type: [], default: [] },
   },
   { timestamps: true }
 );

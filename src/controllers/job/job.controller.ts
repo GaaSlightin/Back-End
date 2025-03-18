@@ -3,7 +3,7 @@ import JobModel from "../../models/job.model";
 import DescriptionModel from "../../models/description.model";
 import { IAuthRequest } from "../../interfaces/auth.interfaces";
 import { Job, Description } from "../../interfaces/job.interfaces";
-import extractJobData from "../../utils/mistralClient";
+import extractJobData from "../../utils/aiClient";
 export class JobController {
   public static getAllJobs = async (
     req: Request,
