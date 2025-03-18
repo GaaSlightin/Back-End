@@ -6,7 +6,7 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import routes from "./routes";
 import { errorHandler } from "./middleware/errorHandler.middleware"; // Import the error handler
-
+import cors from "cors"
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 8080;
@@ -16,6 +16,10 @@ const port = process.env.PORT || 8080;
 })();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true, // Allow cookies to be sent
+}));
 
 app.use(
   session({
