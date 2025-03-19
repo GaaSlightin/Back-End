@@ -31,13 +31,19 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
     existingUser.refreshToken = refreshToken;
     await existingUser.save();
 
-      const cookieOptions = {
-      httpOnly: true,  // Prevent JavaScript access
-      secure: process.env.NODE_ENV === "production", // Secure in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" as "none" : "lax" as "lax", // Adjust based on env
-      path: "/"
-    };
+    // const cookieOptions = {
+    //   httpOnly: true,  // Prevent JavaScript access
+    //   secure: process.env.NODE_ENV === "production", // Secure in production
+    //   sameSite: process.env.NODE_ENV === "production" ? "none" as "none" : "lax" as "lax", // Adjust based on env
+    //   path: "/"
+    // };
 
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,  // Must be true for cross-domain cookies
+    sameSite: "none" as "none",  // Must be "none" for cross-domain
+    path: "/"
+  };
 
     const token = generateAccessToken(existingUser._id);
        res.cookie("accessToken", token, {
