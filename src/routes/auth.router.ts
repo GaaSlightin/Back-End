@@ -16,14 +16,14 @@ const authRouter = express.Router();
 //    });
 //  });
 
-authRouter.get("/github", (req, res) => {
+/*authRouter.get("/github", (req, res) => {
    const clientId = process.env.GITHUB_CLIENT_ID;
    const redirectUri = `${process.env.BACKEND_URL}/api/v0/auth/github/callback`; // Replace with your backend URL
    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`;
  
    // Redirect the user to GitHub's authorization URL
    res.redirect(githubAuthUrl);
- });
+ });*/
 authRouter.get("/github/callback", getAuthorizedViaGithub);
 
 export default authRouter;
