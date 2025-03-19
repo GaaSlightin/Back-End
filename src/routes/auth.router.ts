@@ -16,6 +16,6 @@ const authRouter = express.Router();
 //    });
 //  });
 
-authRouter.get("/github", getAuthorizedViaGithub);
+authRouter.get("/github/callback", getAuthorizedViaGithub);
 
 export default authRouter;
