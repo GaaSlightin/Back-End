@@ -1,11 +1,23 @@
 import { Request, Response, NextFunction } from "express";
 import axios from "axios";
-import { IFetchRepoResponse, IUser } from "../../interfaces/auth.interfaces";
+import { IUser } from "../../interfaces/auth.interfaces";
+import repositoryModel from "../../models/repository.model"; // Import the new Repository model
+import { IFetchRepoResponse, IGitHubBlobResponse, IRepoTree, IRepoTreeResposne } from "../../interfaces/github.interface";
+import scrapeRawCode from "../../utils/rawGitHubScraper";
+import { retrieveFileOutFromJSON } from "@mistralai/mistralai/models/components";
+import { extractRepoPathes, FetchAllUserRepoService, fetchAndDecodeContent, getRepoTree, storeRepoNames } from "../../utils/github.utils";
 
-export const FetchUserRepo = async (req: Request, res: Response, next: NextFunction) => {
+export const DisplayUserRepoNames = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { handler } = req.params; // Extract the handler parameter
-    if (!handler) {
+    const user = req.user as IUser;
+    if(!user){
+      res.status(400).json({
+        status:"Failed",
+        message:"User Not authorized"
+      })
+    }
+    const userHandler=user.userName; // Extract the handler parameter
+    if (!userHandler) {
       res.status(400).json({
         status: "fail",
         message: "Handler parameter is required",
@@ -13,9 +25,11 @@ export const FetchUserRepo = async (req: Request, res: Response, next: NextFunct
       return;
     }
 
-    const repoUrl = `https://api.github.com/users/${handler}/repos`;
-    const response = await axios.get<IFetchRepoResponse[]>(repoUrl); // Explicitly type the response data
-    const repos = response.data;
+    /* ========================== FETCH USER REPOS ================================= */  
+    const repos =await FetchAllUserRepoService(userHandler);
+
+    /* ========================== STORE USER REPORISTORY NAMES ================================= */
+    const repoNames= await storeRepoNames(<IFetchRepoResponse[]>repos,user._id)
 
     if (!repos || repos.length === 0) {
       res.status(404).json({
@@ -27,17 +41,21 @@ export const FetchUserRepo = async (req: Request, res: Response, next: NextFunct
 
     res.status(200).json({
       status: "success",
-      data: repos,
+      data: repoNames,
     });
   } catch (error: any) {
     next(error);
   }
 };
 
-export const ShowRepoTree = async (req: Request, res: Response, next: NextFunction) => {
+
+
+export const GenerateCodeComplexity = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { owner, repo } = req.params;
-    if (!owner || !repo) {
+    const { repo } = req.params;
+    const user =req.user as IUser
+    const userHandle= user.userName
+    if (!userHandle || !repo) {
       res.status(400).json({
         status: "fail",
         message: "Owner and Repo parameter are required",
@@ -45,49 +63,38 @@ export const ShowRepoTree = async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    const user = req.user as IUser; // Get the user information from the req object
-    console.log("User returning in showRepoTree", user);
-    if (!user) {
-      res.status(401).json({
-        status: "fail",
-        message: "User not authenticated",
-      });
-      return;
-    }
-
     const githubAccessToken = user.githubAccessToken; // Use the correct property name
     console.log(githubAccessToken);
-    const repoTree = await getRepoTree(owner, repo, githubAccessToken);
 
+
+
+
+    /* ================================= GET THE REPO TREE =============== */
+    const repoTree = <IRepoTree[]>await getRepoTree(userHandle, repo, githubAccessToken);
+
+
+    /* =============================== EXTRACT THE REPO FILE PATHES==================== */
+    /*const repoPathes = await extractRepoPathes(userHandle, repo, githubAccessToken);
+    console.log("repoPathes",repoPathes)*/
+
+
+
+
+
+    /* ======================================TAKE THE CODE FILE URL FROM REPO TREE REPONSE AND DECODE AND DISPLAY THE CODE======================================*/
+    const code = await fetchAndDecodeContent(repoTree[5].url)
+    console.log("Code",code)
+
+
+
+    
     res.status(200).json({
       status: "success",
-      data: repoTree,
+      test: "NOT DOING MY FUNCTIONALLITY YET",
+      data:repoTree
     });
   } catch (error: any) {
     next(error);
   }
 };
 
-async function getRepoTree(owner: string, repo: string, accessToken: string) {
-  // First get the default branch reference
-  const repoResponse: any = await axios.get(`https://api.github.com/repos/${owner}/${repo}`, {
-    headers: { Authorization: `token ${accessToken}` }
-  });
-
-  const defaultBranch: any = repoResponse.data.default_branch;
-
-  // Get the reference for the default branch
-  const refResponse: any = await axios.get(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${defaultBranch}`, {
-    headers: { Authorization: `token ${accessToken}` }
-  });
-
-  const commitSha: any = refResponse.data.object.sha;
-
-  // Get the tree with recursive=1 to get all files
-  const treeResponse: any = await axios.get(`https://api.github.com/repos/${owner}/${repo}/git/trees/${commitSha}?recursive=1`, {
-    headers: { Authorization: `token ${accessToken}` }
-  });
-
-  // Filter to only include files
-  return treeResponse.data.tree.filter((item: any) => item.type === 'blob');
-}

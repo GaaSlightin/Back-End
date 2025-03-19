@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../../models/user.model";
 import { generateAccessToken, generateRefreshToken } from "../../utils/auth.utils";
-import { Profile } from "../../interfaces/auth.interfaces";
+import { IUser, Profile } from "../../interfaces/auth.interfaces";
 import dotenv from "dotenv"
 dotenv.config()
 

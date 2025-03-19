@@ -1,8 +1,9 @@
 import "../configs/passport-github.configs";
 import express, { RequestHandler } from "express";
 import passport from "passport";
-import { handleGithubAuth } from "../controllers/auth/auth.controller";
+import {handleGithubAuth } from "../controllers/auth/auth.controller";
 import dotenv from "dotenv"
+import { EnsureLoggedIn } from "../middleware/ensure-login.middleware";
 dotenv.config()
 
 const authRouter = express.Router();
@@ -15,5 +16,6 @@ authRouter.get("/failure", (req, res) => {
      message: "GitHub authentication failed. Please try again.",
    });
  });
+ 
 
 export default authRouter;
