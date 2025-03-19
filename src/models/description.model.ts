@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IDescription, Description, Skill } from "../interfaces/job.interfaces";
+import { IDescription } from "../interfaces/job.interfaces";
 
 const descriptionSchema = new Schema<IDescription>(
   {

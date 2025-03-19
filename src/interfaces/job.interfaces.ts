@@ -12,6 +12,7 @@ export interface Job {
   archive_date: Date;
   source: string;
   url: string;
+  skills: Skill[];
 }
 
 export interface IJob extends Job, Document {}
@@ -22,7 +23,7 @@ export interface Description {
   location: string;
   userId: string;
   posting_date: Date;
-  skills: Skill[];
+
   url: string;
   fullText: string;
 }

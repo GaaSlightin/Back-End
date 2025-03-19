@@ -9,6 +9,7 @@ const jobSchema = new Schema<IJob>(
     source: { type: String, required: true },
     url: { type: String, required: true },
     userId: { type: String, required: true, index: true },
+    skills: { type: [], default: [] },
   },
   { timestamps: true }
 );

@@ -3,7 +3,7 @@ import JobModel from "../../models/job.model";
 import DescriptionModel from "../../models/description.model";
 import { IAuthRequest } from "../../interfaces/auth.interfaces";
 import { Job, Description } from "../../interfaces/job.interfaces";
-import {extractJobData} from "../../utils/aiClient";
+import { extractJobData } from "../../utils/aiClient";
 export class JobController {
   public static getAllJobs = async (
     req: Request,
@@ -37,6 +37,7 @@ export class JobController {
         userId,
         title: job.title,
         company: job.company,
+        skills: Array.isArray(job.skills) ? job.skills : [],
         archive_date: new Date(job.archive_date || new Date()),
         source: job.source || new URL(url).hostname,
         url,
@@ -49,7 +50,6 @@ export class JobController {
         userId,
         location: description.location,
         posting_date: new Date(description.posting_date || new Date()),
-        skills: Array.isArray(description.skills) ? description.skills : [],
         url,
         fullText: description.fullText,
       });

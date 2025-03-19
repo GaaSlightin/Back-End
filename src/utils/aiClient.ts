@@ -22,6 +22,7 @@ async function extractJobData(
       "job": {
         "title": "<Extracted Job Title>",
         "company": "<Extracted Company Name>",
+        "skills": ["<Extracted Skill 1>", "<Extracted Skill 2>", "..."],
         "archive_date": "<Extracted Archive Date>",
         "source": "<Extracted Source Name>",
         "url": "<Extracted Job Posting URL>"
@@ -29,7 +30,7 @@ async function extractJobData(
       "description": {
         "location": "<Extracted Job Location>",
         "posting_date": "<Extracted Posting Date> or generate a new date if not found",
-        "skills": ["<Extracted Skill 1>", "<Extracted Skill 2>", "..."],
+
         "url": "<Extracted Job Description URL>",
         "fullText": "<Extracted Complete Job Description>"
       }
@@ -72,11 +73,9 @@ async function extractJobData(
   }
 }
 
-
 async function chooseFilesToBeCalculated(
-  filePathes:string[]
+  filePathes: string[]
 ): Promise<string[]> {
-
   const prompt = `
 I have a list of files from a code repository, and I want to analyze the complexity of the top 5 most logic-heavy files. Based on typical software engineering patterns, file naming conventions, and inferred roles, determine which files are likely to contain the most complex business logic. Prioritize:
   Controllers, services, or business logic layers
@@ -115,8 +114,11 @@ If you cannot determine the top 5 files, return an empty JSON array: []
 
   try {
     const content = response.choices[0].message.content;
-  
-    if (content && (content.trim().startsWith("{") || content.trim().startsWith("["))) {
+
+    if (
+      content &&
+      (content.trim().startsWith("{") || content.trim().startsWith("["))
+    ) {
       const parsedResponse = JSON.parse(content);
       return parsedResponse;
     } else {
@@ -170,7 +172,9 @@ async function calculateComplexity(code: string): Promise<number> {
       if (match) {
         return parseInt(match[0], 10); // Return the matched number as an integer
       } else {
-        throw new Error("Could not extract a valid complexity score from the response");
+        throw new Error(
+          "Could not extract a valid complexity score from the response"
+        );
       }
     } else {
       throw new Error("Response content is null or undefined");
@@ -180,4 +184,4 @@ async function calculateComplexity(code: string): Promise<number> {
     throw error;
   }
 }
-export  {extractJobData,chooseFilesToBeCalculated,calculateComplexity};
+export { extractJobData, chooseFilesToBeCalculated, calculateComplexity };
