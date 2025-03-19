@@ -5,6 +5,6 @@ import { EnsureLoggedIn } from "../middleware/ensure-login.middleware"; // Impor
 const githubRouter = express.Router();
 
 githubRouter.get("/repos", EnsureLoggedIn,DisplayUserRepoNames);
-githubRouter.get("/:repo/tree", EnsureLoggedIn, GenerateCodeComplexity); // Protect the route with EnsureLoggedIn middleware
+githubRouter.get("/:repo/complexity", EnsureLoggedIn, GenerateCodeComplexity); // Protect the route with EnsureLoggedIn middleware
 
 export default githubRouter;

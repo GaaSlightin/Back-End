@@ -1,6 +1,8 @@
+import { fileSchemaToJSON } from "@mistralai/mistralai/models/components";
 import { IFetchRepoResponse, IGitHubBlobResponse, IRepoTree } from "../interfaces/github.interface";
 import repositoryModel from "../models/repository.model";
 import axios from "axios";
+import { chooseFilesToBeCalculated } from "./aiClient";
 
 
 /* ====== FOR DisplayUserRepoNames  ENDPOINTS */
@@ -68,6 +70,8 @@ export const fetchAndDecodeContent = async (url: string): Promise<string> => {
      throw error;
    }
 };
+
+
 export async function getRepoTree(owner: string, repo: string, accessToken: string){
    // First get the default branch reference
    const repoResponse: any = await axios.get(`https://api.github.com/repos/${owner}/${repo}`, {
@@ -91,6 +95,9 @@ export async function getRepoTree(owner: string, repo: string, accessToken: stri
    // Filter to only include files
    return treeResponse.data.tree.filter((item: any) => item.type === 'blob');
 }
+
+
+
 export const extractRepoPathes=async(owner:string,repo:string,accessToken:string) : Promise<string[]>=>{
    try{
      const repoTree =<IRepoTree[]>await getRepoTree(owner,repo,accessToken)
@@ -103,6 +110,6 @@ export const extractRepoPathes=async(owner:string,repo:string,accessToken:string
    }
 }
 export const fileSelection=async(repoFilePathes:string[]):Promise<string[]> => {
-  const selectedFiles=["1","2"]
+  const selectedFiles= await chooseFilesToBeCalculated(repoFilePathes)
   return selectedFiles
 }
