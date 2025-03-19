@@ -28,7 +28,7 @@ export const handleGithubAuth = async (req: Request, res: Response, next: NextFu
       await existingUser.save();
     }
     const refreshToken = generateRefreshToken(existingUser._id);
-    existingUser.refreshToken = refreshToken;
+    // existingUser.refreshToken = refreshToken;
     await existingUser.save();
 
       const cookieOptions = {

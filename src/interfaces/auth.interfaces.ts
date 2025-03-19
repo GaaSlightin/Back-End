@@ -20,7 +20,6 @@ export interface IUser extends Document {
   userName?: string;
   displayName: string;
   profileImage?: string;
-  refreshToken: string;
   createdAt: Date;
   updatedAt: Date;
   githubAccessToken:string;
