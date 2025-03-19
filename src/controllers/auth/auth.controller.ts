@@ -10,31 +10,29 @@ export const getAuthorizedViaGithub = async (req: Request, res: Response, next: 
         const code = req.query.code as string;
         const params = "?client_id=" + process.env.GITHUB_CLIENT_ID + "&client_secret=" + process.env.GITHUB_CLIENT_SECRET + "&code=" + code;
 
-        const response = await fetch("https://github.com/login/oauth/access_token" + params, {
+        const tokenRes = await fetch("https://github.com/login/oauth/access_token" + params, {
             method: "POST",
             headers: {
                 "Accept": "application/json"
             }
         });
 
-        const data = await response.json();
+        const data = await tokenRes.json();
         const githubAccessToken = data.access_token;
-        console.log(githubAccessToken);
 
-        let existingUser = await User.findOne({ githubAccessToken});
+        
+        const userRes = await fetch("https://api.github.com/user", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${githubAccessToken}`
+            }
+        });
+        const fetchedUser = await userRes.json();
+
+        let existingUser = await User.findOne({ userName: fetchedUser.login });
     
-        if (!existingUser) {
-            const response = await fetch("https://api.github.com/user", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${githubAccessToken}`
-                }
-            });
-
-            const fetchedUser = await response.json();
-            console.log(fetchedUser);        
-            
-
+        if (existingUser === null) {
+            console.log("Creating new user");
             existingUser = await User.create({
                 email: fetchedUser.emails?.[0]?.value,
                 userName: fetchedUser.login,
@@ -42,13 +40,14 @@ export const getAuthorizedViaGithub = async (req: Request, res: Response, next: 
                 profileImage: fetchedUser.avatar_url,
                 githubAccessToken
             });
+            console.log(existingUser);
         } else {
+            console.log("Updating existing user");
             existingUser.githubAccessToken = githubAccessToken;
             await existingUser.save();
         }
 
         const accessToken = generateAccessToken(existingUser._id);
-        
         res.status(200).json({ accessToken });
     } catch (error: any) {
     console.error("Error in authentication", error);
