@@ -52,6 +52,7 @@ export class JobController {
         posting_date: new Date(description.posting_date || new Date()),
         url,
         fullText: description.fullText,
+        skills: Array.isArray(job.skills) ? job.skills : [],
       });
 
       const savedDescription = await newDescription.save();

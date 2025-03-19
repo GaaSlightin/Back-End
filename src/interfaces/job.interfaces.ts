@@ -23,7 +23,7 @@ export interface Description {
   location: string;
   userId: string;
   posting_date: Date;
-
+  skills: Skill[];
   url: string;
   fullText: string;
 }

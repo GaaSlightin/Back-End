@@ -30,7 +30,6 @@ async function extractJobData(
       "description": {
         "location": "<Extracted Job Location>",
         "posting_date": "<Extracted Posting Date> or generate a new date if not found",
-
         "url": "<Extracted Job Description URL>",
         "fullText": "<Extracted Complete Job Description>"
       }
