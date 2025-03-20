@@ -231,7 +231,7 @@ export const returnRanks=async(req:Request,res:Response,next:NextFunction)=>{
     const repoWithRanks= await repositoryModel.find({
       userId:user._id
     })
-    if(!repoWithRanks){
+    if(!repoWithRanks || repoWithRanks.length===0){
       res.status(400).json({
         status:"failed",
         message:"user doesnot have ranked repos"
