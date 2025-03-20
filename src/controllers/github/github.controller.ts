@@ -16,7 +16,7 @@ import {
   fetchAndDecodeContent,
   fileSelectionForCodeCalculation,
   getRepoTree,
-  getRepoNames,
+  getRepoDetails,
   fileSelectionForPost,
 } from "../../utils/github.utils";
 import { console } from "inspector";
@@ -45,10 +45,10 @@ export const DisplayUserRepoNames = async (
     }
 
     /* ========================== FETCH USER REPOS ================================= */
-    const repos = await FetchAllUserRepoService(userHandler);
+    const repos = await FetchAllUserRepoService(userHandler, user.githubAccessToken);
 
     /* ========================== STORE USER REPORISTORY NAMES ================================= */
-    const repoNames = await getRepoNames(<IFetchRepoResponse[]>repos, user._id);
+    const repoNames = await getRepoDetails(<IFetchRepoResponse[]>repos);
 
     if (!repos || repos.length === 0) {
       res.status(404).json({

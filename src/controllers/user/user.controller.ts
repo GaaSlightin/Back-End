@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IUser } from "../../interfaces/auth.interfaces";
 import User from "../../models/user.model";
-import { FetchAllUserRepoService, getRepoNames } from "../../utils/github.utils";
+import { FetchAllUserRepoService, getRepoDetails } from "../../utils/github.utils";
 import { IFetchRepoResponse } from "../../interfaces/github.interface";
 
 
@@ -17,9 +17,8 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
        return;
      }
 
-    const repos = await FetchAllUserRepoService(user.userName);
-
-    const updatedRepos = await getRepoNames(<IFetchRepoResponse[]>repos, user._id);
+    const repos = await FetchAllUserRepoService(user.userName, user.githubAccessToken);
+    const updatedRepos = await getRepoDetails(<IFetchRepoResponse[]>repos);
     
     const userProfile = await User.findByIdAndUpdate(
       user._id,

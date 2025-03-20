@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { Document } from "mongoose";
 import { Profile as PassportProfile } from "passport-github";
+import { IRepoDetails } from "./github.interface";
 
 export interface Profile {
    _id: string;
@@ -24,7 +25,7 @@ export interface IUser extends Document {
   company?: string;
   location?: string;
   portfolio?: string;
-  repositories?: string[];
+  repositories?: IRepoDetails[];
   createdAt: Date;
   updatedAt: Date;
   githubAccessToken: string;

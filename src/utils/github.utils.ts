@@ -1,35 +1,36 @@
-import { fileSchemaToJSON } from "@mistralai/mistralai/models/components";
-import { IFetchRepoResponse, IGitHubBlobResponse, IRepoTree } from "../interfaces/github.interface";
-import repositoryModel from "../models/repository.model";
+import { IFetchRepoResponse, IGitHubBlobResponse, IRepoDetails, IRepoTree } from "../interfaces/github.interface";
 import axios from "axios";
 import { chooseFilesToBeCalculated, chooseFilesToCreatePostFrom } from "./aiClient";
 
 
 /* ====== FOR DisplayUserRepoNames  ENDPOINTS */
-export const getRepoNames=async(AllUserRepoResponse:IFetchRepoResponse[],userID:string):Promise<string[]> =>{
-  try{
-
-   const userRepoNames:string[] =AllUserRepoResponse.map(repo=>repo.name)
-
-   console.log(userID)
-   console.log("userRepoNames",userRepoNames)
-
-   /*const repositories=AllUserRepoResponse.map(repo =>({userId:userID, name:repo.name}))
-
-   await repositoryModel.deleteMany({ userId: userID });
-   await repositoryModel.insertMany(repositories);*/
-   return userRepoNames ;
+export const getRepoDetails = async (AllUserRepoResponse: IFetchRepoResponse[]): Promise<IRepoDetails[]> => {
+  try {
+    const reposDetails = AllUserRepoResponse.map(repo => ({
+      name: repo.name,
+      about: repo.description || "",
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      topics: repo.topics || []
+    }));
+    return reposDetails;
+  } catch (error: any) {
+    console.log("Error in getting repos details", error);
+    throw "Error in getting repos details";
   }
-  catch(error:any){
-    console.log("Error in storing the Repos in the database",error)
-    return error;
-  }
-}
-export const FetchAllUserRepoService=async(userHandler:string):Promise<IFetchRepoResponse[]| string > =>{
+};
+
+export const FetchAllUserRepoService=async(userHandler:string, githubAccessToken: string):Promise<IFetchRepoResponse[]| string > =>{
  try{
   const repoUrl = `https://api.github.com/users/${userHandler}/repos`;
-  const response = await axios.get<IFetchRepoResponse[]>(repoUrl); // Explicitly type the response data
+  const response = await axios.get<IFetchRepoResponse[]>(repoUrl, {
+    headers: {
+      Authorization: `token ${githubAccessToken}`, // Use the GitHub Access Token
+    },
+  }); // Explicitly type the response data
   const repos = response.data;
+
+  
   if(!repos ||repos.length===0){
     return "Their is not repos got"
   }
@@ -37,7 +38,7 @@ export const FetchAllUserRepoService=async(userHandler:string):Promise<IFetchRep
  }
  catch(error:any){
   console.log("Error in fetching all repos",error)
-  return error
+  return "Error in getting repos details"
 
  }
 

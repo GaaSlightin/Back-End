@@ -1,6 +1,4 @@
-import { Request } from "express";
 import { Document } from "mongoose";
-import { Profile as PassportProfile } from "passport-github";
 
 export interface IFetchRepoResponse {
    id: number;
@@ -109,6 +107,14 @@ export interface IFetchRepoResponse {
    name: string; // Repository name
    codeComplexity:number;
  }
+
+ export interface IRepoDetails {
+  name: string;
+  about: string;
+  stars: number;
+  forks: number;
+  topics: string[];
+}
 
  export interface IRepoTree{
    path:string;
