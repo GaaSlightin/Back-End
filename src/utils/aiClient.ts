@@ -282,39 +282,38 @@ If the code lacks a compelling story or insights, return an empty JSON object:
 {}
   `;
 
-  const response = await client.chat.completions.create({
-    messages: [
-      { role: "system", content: "" },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    model: "gpt-4o-mini",
-    temperature: 1,
-    max_tokens: 4096,
-    top_p: 1,
-  });
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await client.chat.completions.create({
+        messages: [
+          { role: "system", content: "" },
+          { role: "user", content: prompt },
+        ],
+        model: "gpt-4o-mini",
+        temperature: 1,
+        max_tokens: 4096,
+        top_p: 1,
+      });
 
-  try {
-    const data = response.choices[0].message.content
-      ?.replace("```json", "")
-      .replace("```", "");
+      const data = response.choices[0].message.content
+        ?.replace("```json", "")
+        .replace("```", "");
 
-    if (data) {
-      const parsedResponse = JSON.parse(data);
-      if (parsedResponse.title && parsedResponse.content) {
-        return parsedResponse;
-      } else {
-        throw new Error("Title or content is missing in the response");
+      if (data) {
+        const parsedResponse = JSON.parse(data);
+        if (parsedResponse.title && parsedResponse.content) {
+          return parsedResponse;
+        }
       }
-    } else {
-      throw new Error("Response is not valid JSON");
+
+      console.warn(`Attempt ${attempt} failed: Invalid response, retrying...`);
+    } catch (error) {
+      console.error(`Attempt ${attempt} encountered an error:`, error);
     }
-  } catch (error) {
-    console.error("Error generating post:", error);
-    throw error;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
+
+  throw new Error("Failed to generate a valid post after multiple attempts");
 }
 export {
   extractJobData,
