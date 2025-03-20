@@ -265,12 +265,11 @@ ${code}
 
 🚨 IMPORTANT: 🚨
 Return ONLY a JSON object in the following format:
-
 {
-"title": "<expected title string>",
-"content": "<expected content string>"
+  "title": "<expected title string>",
+  "content": "<expected content string>",
+  "stack": "<technologies used in the code (e.g., Node.js, TypeScript, React, etc.) as Array>"
 }
-
 The post should:
 
 Be insightful and engaging.
@@ -278,7 +277,6 @@ Use short paragraphs and line breaks for readability.
 Include personal or professional reflections.
 Avoid overwhelming readers with code—keep it minimal and illustrative.
 If the code lacks a compelling story or insights, return an empty JSON object:
-
 {}
   `;
 

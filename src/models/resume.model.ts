@@ -6,6 +6,7 @@ const resumeSchema = new Schema<IResume>(
     userId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     link: { type: String, required: true },
+    stack: { type: String, required: true },
   },
   { timestamps: true }
 );

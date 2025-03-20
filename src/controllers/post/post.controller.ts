@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { IAuthRequest } from "../../interfaces/auth.interfaces";
-import { IPost } from "../../interfaces/github.interface";
 import { createPost } from "../../utils/aiClient";
 import PostModel from "../../models/post.model";
-import { errorHandler } from "../../middleware/errorHandler.middleware";
 
 export const getAllPost = async (
   req: Request,
@@ -27,11 +25,12 @@ export const PostContent = async (
     const userId = (req as IAuthRequest).user._id;
     const repo = req.body;
 
-    const { title, content } = await createPost(repo);
+    const { title, content, stack } = await createPost(repo);
     const newPost = new PostModel({
       userId,
       title,
       content,
+      stack,
     });
     if (!title || !content) {
       res.status(400).json({

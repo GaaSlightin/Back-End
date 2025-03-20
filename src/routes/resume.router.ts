@@ -5,12 +5,17 @@ import {
   uploadResumeLink,
   getAllResumes,
 } from "../controllers/resume/resume.controller";
-import { get } from "http";
 
 const resumeRouter = router.Router();
 
-resumeRouter.get("/", EnsureLoggedIn, getAllResumes);
-resumeRouter.post("/", EnsureLoggedIn, uploadResumeLink);
-resumeRouter.get("/:id", EnsureLoggedIn, getResumeById);
+resumeRouter
+  .route("/")
+  .get(EnsureLoggedIn, getAllResumes)
+  .post(EnsureLoggedIn, uploadResumeLink);
+
+resumeRouter
+  .route("/:id")
+  .get(EnsureLoggedIn, getResumeById)
+  .patch(EnsureLoggedIn, getResumeById);
 
 export default resumeRouter;
