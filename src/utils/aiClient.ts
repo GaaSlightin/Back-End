@@ -2,6 +2,7 @@
 import OpenAI from "openai";
 import scrapeJobPage from "./webScrapper";
 import { Job, Description } from "../interfaces/job.interfaces";
+import { IPost } from "../interfaces/github.interface";
 const API_KEY = process.env.OPENAI_API_KEY;
 
 const client = new OpenAI({
@@ -250,27 +251,35 @@ If you cannot determine the top 5 files, return an empty JSON array: []
     throw error;
   }
 }
-async function createPost(code: string): Promise<string> {
+async function createPost(code: string): Promise<IPost> {
   const prompt = `
 I have a code file from a repository, and I want to generate a LinkedIn post that shares valuable insights from it. The post should:
 
-Start with a strong hook (thought-provoking question, challenge, or bold statement)
-Provide real-world context—why this code matters and what problem it solves
-Highlight key learnings, challenges faced, and decisions made
-Include light technical details (but focus on the "why" more than the "how")
-End with a call-to-action (e.g., asking for opinions, experiences, or feedback)
+Start with a strong hook (thought-provoking question, challenge, or bold statement).
+Provide real-world context—why this code matters and what problem it solves.
+Highlight key learnings, challenges faced, and decisions made.
+Include light technical details (but focus on the "why" more than the "how").
+End with a call-to-action (e.g., asking for opinions, experiences, or feedback).
 Here is the code file:
 ${code}
 
-
 🚨 IMPORTANT: 🚨
-Return ONLY the LinkedIn post text. Do NOT include explanations, comments, or additional text. The post should:
+Return ONLY a JSON object in the following format:
 
-Be insightful and engaging
-Use short paragraphs and line breaks for readability
-Include personal or professional reflections
-Avoid overwhelming readers with code—keep it minimal and illustrative
-If the code lacks a compelling story or insights, return an empty string "".
+{
+"title": "<expected title string>",
+"content": "<expected content string>"
+}
+
+The post should:
+
+Be insightful and engaging.
+Use short paragraphs and line breaks for readability.
+Include personal or professional reflections.
+Avoid overwhelming readers with code—keep it minimal and illustrative.
+If the code lacks a compelling story or insights, return an empty JSON object:
+
+{}
   `;
 
   const response = await client.chat.completions.create({
@@ -288,19 +297,20 @@ If the code lacks a compelling story or insights, return an empty string "".
   });
 
   try {
-    const content = response.choices[0].message.content;
+    const data = response.choices[0].message.content;
 
-    // Log the raw response for debugging
-    console.log("Raw Response:", content);
-
-    if (content) {
-      // Return the blog post content if valid
-      return content.trim();
+    if (data) {
+      const parsedResponse = JSON.parse(data);
+      if (parsedResponse.title && parsedResponse.content) {
+        return parsedResponse;
+      } else {
+        throw new Error("Title or content is missing in the response");
+      }
     } else {
-      throw new Error("Response content is null or empty");
+      throw new Error("Response is not valid JSON");
     }
   } catch (error) {
-    console.error("Error generating blog post:", error);
+    console.error("Error generating post:", error);
     throw error;
   }
 }
