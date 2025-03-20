@@ -3,10 +3,12 @@ import OpenAI from "openai";
 import scrapeJobPage from "./webScrapper";
 import { Job, Description } from "../interfaces/job.interfaces";
 const API_KEY = process.env.OPENAI_API_KEY;
-
+const API_KEY_YEHIA = process.env.OPENAI_API_KEY_YEHIA;
+console.log(API_KEY)
+console.log(API_KEY_YEHIA)
 const client = new OpenAI({
   baseURL: "https://models.inference.ai.azure.com",
-  apiKey: API_KEY,
+  apiKey: API_KEY_YEHIA,
 });
 
 async function extractJobData(
