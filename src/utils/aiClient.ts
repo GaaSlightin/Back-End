@@ -131,18 +131,21 @@ If you cannot determine the top 5 files, return an empty JSON array: []
 
 async function calculateComplexity(code: string): Promise<number> {
   const prompt = `
-  I will provide you with a code snippet, and I want you to analyze its complexity on a scale of 1 to 10. Consider factors such as:
+  I will provide you with a combined code snippet that includes multiple files from a code repository. Each file's content is prefixed with its file path for context. Analyze the overall complexity of the combined code on a scale of 5.5 to 10. Consider the following factors:
 
-  - The number of logical branches (if-else, loops, recursion)
-  - The depth of nested structures
-  - The use of advanced patterns (e.g., functional programming, design patterns)
-  - The number of dependencies or external calls
-  - The readability and maintainability of the code
+- The number of logical branches (if-else, loops, recursion) across all files.
+- The depth of nested structures and their impact on readability.
+- The use of advanced patterns (e.g., functional programming, design patterns).
+- The number of dependencies or external calls present in the code.
+- The overall readability, maintainability, and modularity of the combined code.
 
-  Score the complexity from 1 (very simple) to 10 (highly complex), and provide a brief explanation for the rating.
+Provide a single numeric score for the complexity (5.5 = moderately complex, 10 = highly complex). Additionally, provide a brief explanation for the rating, focusing on the combined logic and structure of the code.
 
-  Here is the code:
-  ${code}
+Here is the combined code:
+${code}
+
+🚨 IMPORTANT: 🚨
+Return ONLY the numeric score (between 5.5 and 10) and a brief explanation. Do NOT include any additional text, summaries, or comments.
   `;
 
   const response = await client.chat.completions.create({
