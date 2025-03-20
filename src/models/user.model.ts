@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 
 const RepoDetailsSchema = new Schema(
   {
+    id: { type: Number, required: true },
     name: { type: String, required: true },
     about: { type: String },
     stars: { type: Number, required: true },

@@ -109,6 +109,7 @@ export interface IFetchRepoResponse {
  }
 
  export interface IRepoDetails {
+  id: number;
   name: string;
   about: string;
   stars: number;

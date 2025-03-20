@@ -4,9 +4,12 @@ import { chooseFilesToBeCalculated, chooseFilesToCreatePostFrom } from "./aiClie
 
 
 /* ====== FOR DisplayUserRepoNames  ENDPOINTS */
+let repoIdCounter = 1; // Initialize a counter for unique, contiguous IDs
+
 export const getRepoDetails = async (AllUserRepoResponse: IFetchRepoResponse[]): Promise<IRepoDetails[]> => {
   try {
     const reposDetails = AllUserRepoResponse.map(repo => ({
+      id: repoIdCounter++, 
       name: repo.name,
       about: repo.description || "",
       stars: repo.stargazers_count,
