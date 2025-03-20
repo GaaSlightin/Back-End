@@ -107,6 +107,7 @@ export interface IFetchRepoResponse {
  export interface IRepository extends Document {
    userId: string; // Reference to the user
    name: string; // Repository name
+   codeComplexity: number; // Repository name
  }
 
  export interface IRepoTree{

@@ -6,7 +6,7 @@ import { chooseFilesToBeCalculated } from "./aiClient";
 
 
 /* ====== FOR DisplayUserRepoNames  ENDPOINTS */
-export const storeRepoNames=async(AllUserRepoResponse:IFetchRepoResponse[],userID:string):Promise<string[]> =>{
+export const getRepoNames=async(AllUserRepoResponse:IFetchRepoResponse[],userID:string):Promise<string[]> =>{
   try{
 
    const userRepoNames:string[] =AllUserRepoResponse.map(repo=>repo.name)
@@ -14,10 +14,10 @@ export const storeRepoNames=async(AllUserRepoResponse:IFetchRepoResponse[],userI
    console.log(userID)
    console.log("userRepoNames",userRepoNames)
 
-   const repositories=AllUserRepoResponse.map(repo =>({userId:userID, name:repo.name}))
+   //const repositories=AllUserRepoResponse.map(repo =>({userId:userID, name:repo.name}))
 
-   await repositoryModel.deleteMany({ userId: userID });
-   await repositoryModel.insertMany(repositories);
+   /*await repositoryModel.deleteMany({ userId: userID });
+   await repositoryModel.insertMany(repositories);*/
    return userRepoNames ;
   }
   catch(error:any){
