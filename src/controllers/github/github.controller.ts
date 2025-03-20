@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import axios from "axios";
+import axios, { post } from "axios";
 import { IUser } from "../../interfaces/auth.interfaces";
 import repositoryModel from "../../models/repository.model"; // Import the new Repository model
 import {
@@ -14,12 +14,13 @@ import {
   extractRepoPathes,
   FetchAllUserRepoService,
   fetchAndDecodeContent,
-  fileSelection,
+  fileSelectionForCodeCalculation,
   getRepoTree,
   getRepoNames,
+  fileSelectionForPost,
 } from "../../utils/github.utils";
 import { console } from "inspector";
-import { calculateComplexity } from "../../utils/aiClient";
+import { calculateComplexity, createPost } from "../../utils/aiClient";
 
 export const DisplayUserRepoNames = async (
   req: Request,
@@ -100,7 +101,7 @@ export const GenerateCodeComplexity = async (
     //console.log("repoPathes",repoPathes)
 
     /* =======================================Files That been choosen to calculate complexity============================= */
-    const filesTobeCalculated = await fileSelection(repoPathes);
+    const filesTobeCalculated = await fileSelectionForCodeCalculation(repoPathes);
     //console.log("Files that llm choosen",filesTobeCalculated)
 
     /*=========================================File URLs========================= */
@@ -142,6 +143,74 @@ export const GenerateCodeComplexity = async (
     res.status(200).json({
       status: "success",
       data: existedRepo,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const GeneratePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { repo } = req.params;
+    const user = req.user as IUser;
+    const userHandle = user.userName;
+    if (!userHandle || !repo) {
+      res.status(400).json({
+        status: "fail",
+        message: "Owner and Repo parameter are required",
+      });
+      return;
+    }
+
+    const githubAccessToken = user.githubAccessToken; // Use the correct property name
+    console.log(githubAccessToken);
+
+    /* ================================= GET THE REPO TREE =============== */
+    const repoTree = <IRepoTree[]>(
+      await getRepoTree(userHandle, repo, githubAccessToken)
+    );
+
+    /* =============================== EXTRACT THE REPO FILE PATHES==================== */
+    const repoPathes = await extractRepoPathes(
+      userHandle,
+      repo,
+      githubAccessToken
+    );
+    //console.log("repoPathes",repoPathes)
+
+    /* =======================================Files That been choosen to calculate complexity============================= */
+    const filesTobeCalculated = await fileSelectionForPost(repoPathes);
+    console.log("Files that llm choosen",filesTobeCalculated)
+
+    /*=========================================File URLs========================= */
+
+    const filesTobeCalculatedURl = repoTree
+      .filter((repo) => filesTobeCalculated.includes(repo.path))
+      .map((repo) => repo.url);
+    //console.log("files to be calculated url",filesTobeCalculatedURl)
+
+    /* ======================================Calculate Complexity for Each File======================================*/
+
+    let combinedCode = "";
+
+    for (const fileUrl of filesTobeCalculatedURl) {
+      try {
+        const fileContent = await fetchAndDecodeContent(fileUrl); // Fetch file content
+        combinedCode += `${fileUrl} :\n ${fileContent}\n\n`; // Append file content with its URL for context
+      } catch (error) {
+        console.error(`Error processing file ${fileUrl}:`, error);
+      }
+    }
+     const post = await createPost(combinedCode);
+    /* ====================================== Compute Complexity as Percentage ====================================== */
+
+    res.status(200).json({
+      status: "success",
+      data: post,
     });
   } catch (error: any) {
     next(error);

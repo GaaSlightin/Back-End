@@ -2,7 +2,7 @@ import { fileSchemaToJSON } from "@mistralai/mistralai/models/components";
 import { IFetchRepoResponse, IGitHubBlobResponse, IRepoTree } from "../interfaces/github.interface";
 import repositoryModel from "../models/repository.model";
 import axios from "axios";
-import { chooseFilesToBeCalculated } from "./aiClient";
+import { chooseFilesToBeCalculated, chooseFilesToCreatePostFrom } from "./aiClient";
 
 
 /* ====== FOR DisplayUserRepoNames  ENDPOINTS */
@@ -109,7 +109,11 @@ export const extractRepoPathes=async(owner:string,repo:string,accessToken:string
      return error
    }
 }
-export const fileSelection=async(repoFilePathes:string[]):Promise<string[]> => {
+export const fileSelectionForCodeCalculation=async(repoFilePathes:string[]):Promise<string[]> => {
   const selectedFiles= await chooseFilesToBeCalculated(repoFilePathes)
+  return selectedFiles
+}
+export const fileSelectionForPost=async(repoFilePathes:string[]):Promise<string[]> => {
+  const selectedFiles= await chooseFilesToCreatePostFrom(repoFilePathes)
   return selectedFiles
 }

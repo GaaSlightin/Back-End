@@ -186,4 +186,120 @@ Return ONLY the numeric score (between 5.5 and 10) and a brief explanation. Do N
     throw error;
   }
 }
-export { extractJobData, chooseFilesToBeCalculated, calculateComplexity };
+
+async function chooseFilesToCreatePostFrom(
+  filePathes: string[]
+): Promise<string[]> {
+  const prompt = `
+ have a list of files from a code repository, and I want to identify the top 5 files that would make for the most interesting and valuable blog posts. Based on typical software development patterns, file naming conventions, and inferred importance, determine which files are the best candidates for technical content. Prioritize:
+
+Files that contain unique or innovative implementations
+Key architectural components (e.g., core services, critical algorithms, or novel solutions)
+Code that illustrates best practices, optimizations, or design patterns
+Files that solve common engineering challenges in an interesting way
+Simple configuration files, boilerplate, or minor utilities should be deprioritized
+
+Here is the list of files:
+${filePathes}
+
+🚨 IMPORTANT: 🚨
+Return ONLY a JSON array of the top 5 file paths that would make for strong blog post topics. Do NOT include any explanations, comments, or additional text. The JSON format should look like this:
+
+[
+  "file1.js",
+  "file2.js",
+  "file3.js",
+  "file4.js",
+  "file5.js"
+]
+
+
+If you cannot determine the top 5 files, return an empty JSON array: []
+`;
+
+  const response = await client.chat.completions.create({
+    messages: [
+      { role: "system", content: "" },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    model: "gpt-4o-mini",
+    temperature: 1,
+    max_tokens: 4096,
+    top_p: 1,
+  });
+
+  try {
+    const content = response.choices[0].message.content;
+
+    if (
+      content &&
+      (content.trim().startsWith("{") || content.trim().startsWith("["))
+    ) {
+      const parsedResponse = JSON.parse(content);
+      return parsedResponse;
+    } else {
+      throw new Error("Response is not valid JSON");
+    }
+  } catch (error) {
+    console.error("Error parsing response:", error);
+    throw error;
+  }
+}
+async function createPost(code: string): Promise<string> {
+  const prompt = `
+I have a code file from a repository, and I want to generate a LinkedIn post that shares valuable insights from it. The post should:
+
+Start with a strong hook (thought-provoking question, challenge, or bold statement)
+Provide real-world context—why this code matters and what problem it solves
+Highlight key learnings, challenges faced, and decisions made
+Include light technical details (but focus on the "why" more than the "how")
+End with a call-to-action (e.g., asking for opinions, experiences, or feedback)
+Here is the code file:
+${code}
+
+
+🚨 IMPORTANT: 🚨
+Return ONLY the LinkedIn post text. Do NOT include explanations, comments, or additional text. The post should:
+
+Be insightful and engaging
+Use short paragraphs and line breaks for readability
+Include personal or professional reflections
+Avoid overwhelming readers with code—keep it minimal and illustrative
+If the code lacks a compelling story or insights, return an empty string "".
+  `;
+
+  const response = await client.chat.completions.create({
+    messages: [
+      { role: "system", content: "" },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    model: "gpt-4o-mini",
+    temperature: 1,
+    max_tokens: 4096,
+    top_p: 1,
+  });
+
+  try {
+    const content = response.choices[0].message.content;
+
+    // Log the raw response for debugging
+    console.log("Raw Response:", content);
+
+    if (content) {
+      // Return the blog post content if valid
+      return content.trim();
+    } else {
+      throw new Error("Response content is null or empty");
+    }
+  } catch (error) {
+    console.error("Error generating blog post:", error);
+    throw error;
+  }
+}
+export { extractJobData, chooseFilesToBeCalculated, calculateComplexity,chooseFilesToCreatePostFrom,createPost };
