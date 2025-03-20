@@ -217,3 +217,33 @@ export const GeneratePost = async (
     next(error);
   }
 };
+export const returnRanks=async(req:Request,res:Response,next:NextFunction)=>{
+  try{
+    const user = req.user as IUser;
+    const userHandle = user.userName;
+    if (!userHandle) {
+      res.status(400).json({
+        status: "fail",
+        message: "user not authenticated",
+      });
+      return;
+    }
+    const repoWithRanks= await repositoryModel.find({
+      userId:user._id
+    })
+    if(!repoWithRanks){
+      res.status(400).json({
+        status:"failed",
+        message:"user doesnot have ranked repos"
+      });
+      return;
+    }
+    res.status(200).json({
+      status:"Success",
+      message:repoWithRanks
+    })
+  }
+  catch(error:any){
+    next(error)
+  }
+}
