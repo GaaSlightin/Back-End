@@ -1,15 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import axios, { post } from "axios";
 import { IUser } from "../../interfaces/auth.interfaces";
 import repositoryModel from "../../models/repository.model"; // Import the new Repository model
 import {
   IFetchRepoResponse,
-  IGitHubBlobResponse,
   IRepoTree,
-  IRepoTreeResposne,
 } from "../../interfaces/github.interface";
-import scrapeRawCode from "../../utils/rawGitHubScraper";
-import { retrieveFileOutFromJSON } from "@mistralai/mistralai/models/components";
+
 import {
   extractRepoPathes,
   FetchAllUserRepoService,
@@ -45,7 +41,10 @@ export const DisplayUserRepoNames = async (
     }
 
     /* ========================== FETCH USER REPOS ================================= */
-    const repos = await FetchAllUserRepoService(userHandler, user.githubAccessToken);
+    const repos = await FetchAllUserRepoService(
+      userHandler,
+      user.githubAccessToken
+    );
 
     /* ========================== STORE USER REPORISTORY NAMES ================================= */
     const repoNames = await getRepoDetails(<IFetchRepoResponse[]>repos);
@@ -101,7 +100,9 @@ export const GenerateCodeComplexity = async (
     //console.log("repoPathes",repoPathes)
 
     /* =======================================Files That been choosen to calculate complexity============================= */
-    const filesTobeCalculated = await fileSelectionForCodeCalculation(repoPathes);
+    const filesTobeCalculated = await fileSelectionForCodeCalculation(
+      repoPathes
+    );
     //console.log("Files that llm choosen",filesTobeCalculated)
 
     /*=========================================File URLs========================= */
@@ -127,8 +128,8 @@ export const GenerateCodeComplexity = async (
     totalComplexity = await calculateComplexity(combinedCode);
     /* ====================================== Compute Complexity as Percentage ====================================== */
 
-    console.log(totalComplexity)
-    totalComplexity=totalComplexity*10;
+    console.log(totalComplexity);
+    totalComplexity = totalComplexity * 10;
     let existedRepo = await repositoryModel.findOne({
       name: repo,
     });
@@ -184,7 +185,7 @@ export const GeneratePost = async (
 
     /* =======================================Files That been choosen to calculate complexity============================= */
     const filesTobeCalculated = await fileSelectionForPost(repoPathes);
-    console.log("Files that llm choosen",filesTobeCalculated)
+    console.log("Files that llm choosen", filesTobeCalculated);
 
     /*=========================================File URLs========================= */
 
@@ -205,7 +206,7 @@ export const GeneratePost = async (
         console.error(`Error processing file ${fileUrl}:`, error);
       }
     }
-     const post = await createPost(combinedCode);
+    const post = await createPost(combinedCode);
     /* ====================================== Compute Complexity as Percentage ====================================== */
 
     res.status(200).json({
