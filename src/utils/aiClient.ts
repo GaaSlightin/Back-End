@@ -5,7 +5,7 @@ import { Job, Description } from "../interfaces/job.interfaces";
 const API_KEY = process.env.OPENAI_API_KEY;
 
 const client = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
+  baseURL: "https://models.inference.ai.azure.com",
   apiKey: API_KEY,
 });
 
@@ -61,7 +61,9 @@ async function extractJobData(
 
   try {
     if (response.choices[0].message.content) {
-      const parsedResponse = JSON.parse(response.choices[0].message.content);
+      let rawResponse = response.choices[0].message.content;
+      rawResponse = rawResponse.replace("```json", "").replace("```", "");
+      const parsedResponse = JSON.parse(rawResponse);
       return parsedResponse;
     } else {
       throw new Error("Response content is null");
@@ -302,4 +304,10 @@ If the code lacks a compelling story or insights, return an empty string "".
     throw error;
   }
 }
-export { extractJobData, chooseFilesToBeCalculated, calculateComplexity,chooseFilesToCreatePostFrom,createPost };
+export {
+  extractJobData,
+  chooseFilesToBeCalculated,
+  calculateComplexity,
+  chooseFilesToCreatePostFrom,
+  createPost,
+};
