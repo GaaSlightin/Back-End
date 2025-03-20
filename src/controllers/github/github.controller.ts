@@ -55,68 +55,65 @@ export const DisplayUserRepoNames = async (req: Request, res: Response, next: Ne
 export const GenerateCodeComplexity = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { repo } = req.params;
-    const user =req.user as IUser
-    const userHandle= user.userName
+    const user = req.user as IUser;
+    const userHandle = user.userName;
+
     if (!userHandle || !repo) {
-      res.status(400).json({
+      return res.status(400).json({
         status: "fail",
         message: "Owner and Repo parameter are required",
       });
-      return;
     }
 
-    const githubAccessToken = user.githubAccessToken; // Use the correct property name
-    console.log(githubAccessToken);
-
-
-
+    const githubAccessToken = user.githubAccessToken;
 
     /* ================================= GET THE REPO TREE =============== */
     const repoTree = <IRepoTree[]>await getRepoTree(userHandle, repo, githubAccessToken);
 
-
     /* =============================== EXTRACT THE REPO FILE PATHES==================== */
     const repoPathes = await extractRepoPathes(userHandle, repo, githubAccessToken);
-    //console.log("repoPathes",repoPathes)
 
-
-
-    /* =======================================Files That been choosen to calculate complexity============================= */
-      const filesTobeCalculated = await fileSelection(repoPathes)
-      //console.log("Files that llm choosen",filesTobeCalculated)
-      
-    /*=========================================File URLs========================= */
-
-      const filesTobeCalculatedURl = repoTree
+    /* ======================================= Files to Calculate Complexity ============================= */
+    const filesTobeCalculated = await fileSelection(repoPathes);
+    const filesTobeCalculatedURl = repoTree
       .filter(repo => filesTobeCalculated.includes(repo.path))
       .map(repo => repo.url);
-      //console.log("files to be calculated url",filesTobeCalculatedURl)
-
-     /* ======================================Calculate Complexity for Each File======================================*/
-    
-      let totalComplexity=0
-      for (const fileUrl of filesTobeCalculatedURl){
-        try{
-          const code =await fetchAndDecodeContent(fileUrl)
-          const complexity= await calculateComplexity(code)
-          totalComplexity+=complexity
-        }
-        catch(error){
-          console.error(`Error processing file ${fileUrl} :`,error)
-        }
+    console.log("filesTobeCalculatedURl",filesTobeCalculatedURl)
+    /* ====================================== Fetch and Combine Code ====================================== */
+    let combinedCode = "";
+    for (const fileUrl of filesTobeCalculatedURl) {
+      try {
+        const code = await fetchAndDecodeContent(fileUrl);
+        combinedCode += code+"\n"; // Add file separation for clarity
+      } catch (error) {
+        console.error(`Error fetching file ${fileUrl}:`, error);
       }
-      /* ====================================== Compute Complexity as Percentage ====================================== */
-    const maxComplexity = filesTobeCalculatedURl.length * 10; // Maximum possible complexity
-    const complexityPercentage = maxComplexity > 0 ? (totalComplexity / maxComplexity) * 100 : 0;
-    console.log("Complexity Percentage:", complexityPercentage);
+    }
 
-      
+    if (!combinedCode) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No valid code could be fetched from the selected files.",
+      });
+    }
+    /* ======================================calculate complexity ====================================== */
+    let complexityPercentage = 0;
+    try {
+      complexityPercentage = await calculateComplexity(combinedCode); // Send combined code to LLM
+    } catch (error) {
+      console.error("Error calculating complexity:", error);
+      return res.status(500).json({
+        status: "fail",
+        message: "Error calculating code complexity.",
+      });
+    }
+
     res.status(200).json({
       status: "success",
-      data:complexityPercentage
+      //data: combinedCode,
+      complexityPercentage
     });
   } catch (error: any) {
     next(error);
   }
 };
-
