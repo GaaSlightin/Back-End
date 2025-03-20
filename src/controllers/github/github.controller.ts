@@ -117,6 +117,7 @@ export const GenerateCodeComplexity = async (req: Request, res: Response, next: 
       res.json({
         message:"Repo already exist"
       })
+      return;
     }
     await repositoryModel.create({
       userId:user._id,
