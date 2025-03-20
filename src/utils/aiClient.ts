@@ -297,7 +297,9 @@ If the code lacks a compelling story or insights, return an empty JSON object:
   });
 
   try {
-    const data = response.choices[0].message.content;
+    const data = response.choices[0].message.content
+      ?.replace("```json", "")
+      .replace("```", "");
 
     if (data) {
       const parsedResponse = JSON.parse(data);
