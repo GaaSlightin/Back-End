@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { IPost } from "../interfaces/github.interface";
 
-const postSchema = new mongoose.Schema<IPost>(
+const postSchema = new Schema<IPost>(
   {
     userId: { type: String, required: true, index: true },
     title: { type: String, required: true },
