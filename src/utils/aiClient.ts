@@ -5,7 +5,7 @@ import { Job, Description } from "../interfaces/job.interfaces";
 const API_KEY = process.env.OPENAI_API_KEY;
 
 const client = new OpenAI({
-  baseURL: "https://models.inference.ai.azure.com",
+  baseURL: "https://openrouter.ai/api/v1",
   apiKey: API_KEY,
 });
 
