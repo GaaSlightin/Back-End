@@ -5,7 +5,7 @@ import repositoryModel from "../../models/repository.model"; // Import the new R
 import { IFetchRepoResponse, IGitHubBlobResponse, IRepoTree, IRepoTreeResposne } from "../../interfaces/github.interface";
 import scrapeRawCode from "../../utils/rawGitHubScraper";
 import { retrieveFileOutFromJSON } from "@mistralai/mistralai/models/components";
-import { extractRepoPathes, FetchAllUserRepoService, fetchAndDecodeContent, fileSelection, getRepoTree, storeRepoNames } from "../../utils/github.utils";
+import { extractRepoPathes, FetchAllUserRepoService, fetchAndDecodeContent, fileSelection, getRepoTree, getRepoNames } from "../../utils/github.utils";
 import { console } from "inspector";
 import { calculateComplexity } from "../../utils/aiClient";
 
@@ -31,7 +31,7 @@ export const DisplayUserRepoNames = async (req: Request, res: Response, next: Ne
     const repos =await FetchAllUserRepoService(userHandler);
 
     /* ========================== STORE USER REPORISTORY NAMES ================================= */
-    const repoNames= await storeRepoNames(<IFetchRepoResponse[]>repos,user._id)
+    const repoNames= await getRepoNames(<IFetchRepoResponse[]>repos,user._id)
 
     if (!repos || repos.length === 0) {
       res.status(404).json({
@@ -109,7 +109,20 @@ export const GenerateCodeComplexity = async (req: Request, res: Response, next: 
     const maxComplexity = filesTobeCalculatedURl.length * 10; // Maximum possible complexity
     const complexityPercentage = maxComplexity > 0 ? (totalComplexity / maxComplexity) * 100 : 0;
     console.log("Complexity Percentage:", complexityPercentage);
-
+    
+    const isRepoExist=await repositoryModel.findOne({
+      name:repo
+    })
+    if(isRepoExist){
+      res.json({
+        message:"Repo already exist"
+      })
+    }
+    await repositoryModel.create({
+      userId:user._id,
+      name:repo,
+      codeComplexity:complexityPercentage
+    })
       
     res.status(200).json({
       status: "success",
