@@ -16,15 +16,18 @@ export interface Profile {
 
 export interface IUser extends Document {
   _id: string; // the id will become the result of random uuid coming from crypto package
-  password?: string;
   email?: string;
   userName?: string;
   displayName: string;
   profileImage?: string;
+  bio?: string;
+  company?: string;
+  location?: string;
+  portfolio?: string;
+  repositories?: string[];
   createdAt: Date;
   updatedAt: Date;
   githubAccessToken: string;
-  //repositories: string[]; // Add this field to store repo names
 }
 export interface IAuthRequest extends Request {
   user: IUser;

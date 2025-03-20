@@ -28,16 +28,27 @@ export const getAuthorizedViaGithub = async (req: Request, res: Response, next: 
             }
         });
         const fetchedUser = await userRes.json();
+        console.log(fetchedUser);
+
+        if( fetchedUser.status === "401" ) {
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
 
         let existingUser = await User.findOne({ userName: fetchedUser.login });
     
         if (existingUser === null) {
             console.log("Creating new user");
+
             existingUser = await User.create({
                 email: fetchedUser.emails?.[0]?.value,
                 userName: fetchedUser.login,
                 displayName: fetchedUser.name,
                 profileImage: fetchedUser.avatar_url,
+                bio: fetchedUser.bio,
+                company: fetchedUser.company,
+                location: fetchedUser.location,
+                portfolio: fetchedUser.blog,
                 githubAccessToken
             });
             console.log(existingUser);
