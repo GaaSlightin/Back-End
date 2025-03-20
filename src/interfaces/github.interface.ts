@@ -142,4 +142,5 @@ export interface IPost {
   userId: string;
   title: string;
   content: string;
+  stack: string[];
 }

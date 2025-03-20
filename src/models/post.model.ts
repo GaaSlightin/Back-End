@@ -6,7 +6,7 @@ const postSchema = new Schema<IPost>(
     userId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    stack: { type: [String], required: true },
+    stack: { type: [], required: true },
   },
   { timestamps: true }
 );
